@@ -31,7 +31,9 @@ function do_build_canshu(num_min, num_max, num_float, num_random) {
 	let num_result
 	if (num_make >= 0 && num_make <= num_random) {
 		num_result = parseFloat(num_min + Math.random() * (num_max - num_min)).toFixed(num_float);
-
+		if(num_result<0){
+			num_result="("+num_result+")"
+		}
 		return num_result;
 	} else {
 		console.log("concel");
@@ -46,6 +48,7 @@ function do_build_yunsuanfu(fu_arr) {
 }
 
 function do_build_string() {
+	let suanshi='';
 	let canshu = $(".co_canshu");
 	let yunsuanfu = $(".co_yunsuanfu");
 	for (let index = 0; index < canshu.length; index++) {
@@ -55,11 +58,11 @@ function do_build_string() {
 		let canshu_float = 0;
 		let canshu_random = 0;
 		let real_index = index + 1;
-		if (!canshu_min) {
+		if (!canshu_min&&canshu_min!=0) {
 			let real_index = index + 1;
 			alert("数字" + real_index + "中在最小值上存在错误，请检查！");
 			return;
-		} else if (!canshu_max) {
+		} else if (!canshu_max&&canshu_max!=0) {
 			alert("数字" + real_index + "中在最大值上存在错误，请检查！");
 			return;
 		} else if (canshu_min > canshu_max) {
@@ -77,13 +80,13 @@ function do_build_string() {
 				canshu_random = parseInt(canshu.eq(index).children("input")[3].value);
 			}
 		}
-		do_build_canshu(canshu_min, canshu_max, canshu_float, canshu_random);
+		suanshi+=do_build_canshu(canshu_min, canshu_max, canshu_float, canshu_random);
 		//验证并初始化运算符号
-		yunsuanfu=yunsuanfu.eq(index).find("input")
-		let yuansuanfu_jia = yunsuanfu.eq(0).prop("checked");
-		let yuansuanfu_jian = yunsuanfu.eq(1).prop("checked");
-		let yuansuanfu_cheng =yunsuanfu.eq(2).prop("checked");
-		let yuansuanfu_chu = yunsuanfu.eq(3).prop("checked");
+		let yunsuanfu_input=yunsuanfu.eq(index).find("input")
+		let yuansuanfu_jia = yunsuanfu_input.eq(0).prop("checked");
+		let yuansuanfu_jian = yunsuanfu_input.eq(1).prop("checked");
+		let yuansuanfu_cheng =yunsuanfu_input.eq(2).prop("checked");
+		let yuansuanfu_chu = yunsuanfu_input.eq(3).prop("checked");
 		let yuansuanfu_arr = [];
 		if (index < yunsuanfu.length) {
 			if (yuansuanfu_jia || yuansuanfu_jian || yuansuanfu_cheng || yuansuanfu_chu) {
@@ -99,7 +102,7 @@ function do_build_string() {
 				if (yuansuanfu_chu) {
 					yuansuanfu_arr.push('/');
 				}
-				do_build_yunsuanfu(yuansuanfu_arr)
+				suanshi+=do_build_yunsuanfu(yuansuanfu_arr);
 			} else {
 				alert("请至少选择一个运算符")
 				return;
@@ -107,6 +110,7 @@ function do_build_string() {
 			
 		}
 	}
+	console.log(suanshi);
 }
 
 
