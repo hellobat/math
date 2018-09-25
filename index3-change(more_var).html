@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.css" />
+	<link rel="stylesheet" type="text/css" href="css/auto.css" />
+	<script src="js/jquery-1.11.0.js" type="text/javascript" charset="utf-8"></script>
+	<script src="js/bootstrap.js" type="text/javascript" charset="utf-8"></script>
+	<script src="js/auto3_more_var.js" type="text/javascript" charset="utf-8"></script>
+	<title></title>
+
+</head>
+
+<body>
+	<div class="container-fluid" id="show">
+		<form>
+			<div class="row" id=co_head>
+				<h4 class="text-center">瞳瞳爸口算题自动生成器</h4>
+				<div class="co_in">
+					<div class="col-xs-12">
+						<label>输入试卷标题</label>
+						<input class="form-control" type="text" name="co_title" placeholder="___年___班___________口算题">
+					</div>
+				</div>
+			</div>
+
+			<!-- 计算参数 -->
+			<div class="row" id="co_body">
+				<div class="co_in" id="co_body_in">
+					<div class="col-xs-12 co_label">
+						<label for="">第1个数字</label>
+					</div>
+					<div class="col-xs-12 co_block co_canshu">
+						<input class="form-control" type="text" name="nr1" placeholder="最小值">
+						<br>
+						<input class="form-control" type="text" name="nr1" placeholder="最大值">
+						<br>
+						<input class="form-control" type="text" name="nr1" placeholder="保留几位小数">
+					</div>
+					<div class="col-xs-12 co_label">
+						<label>运算符</label>
+					</div>
+					<div class="col-xs-12 co_block co_yunsuanfu">
+						<label class="checkbox-inline"><input type="checkbox" name="fuhao" value="jia">加法（+）</label>
+						<label class="checkbox-inline"><input type="checkbox" name="fuhao" value="jian">减法（-）</label>
+						<label class="checkbox-inline"><input type="checkbox" name="fuhao" value="cheng">乘法（×）</label>
+						<label class="checkbox-inline"><input type="checkbox" name="fuhao" value="chu">除法(÷)</label>
+					</div>
+					<div class="col-xs-12 co_label">
+						<label>第2个数字</label>
+					</div>
+					<div class="col-xs-12 co_block co_canshu ">
+						<input class="form-control" type="text" name="nr1" placeholder="最小值">
+						<br>
+						<input class="form-control" type="text" name="nr1" placeholder="最大值">
+						<br>
+						<input class="form-control" type="text" name="nr1" placeholder="保留几位小数">
+
+					</div>
+				</div>
+			</div>
+
+			<!-- 添加按钮 -->
+			<div class="row" id="co_add">
+				<div class="col-xs-4 co_block ">
+				</div>
+				<div class="col-xs-4 co_block ">
+					<div class="center-block text-center" id="co_add_a"><span class="glyphicon glyphicon-plus-sign" style="font-size:50px;color:#000"></span></div>
+				</div>
+				<div class="col-xs-4 co_block ">
+				</div>
+			</div>
+
+			<!-- 计算结果 -->
+			<div class="row" id="co_foot">
+				<div class="co_in">
+					<div class="col-xs-12 co_block">
+
+						<label class="checkbox-inline"><input id="show_jieguo" type="checkbox" name="fuhao" value="jia" data-toggle="collapse"
+							 data-target="#jieguo" aria-expanded="true" aria-controls="collapseExample" checked>结果范围</label>
+
+
+						<div class="collapse in" id="jieguo">
+
+							<input class="form-control" type="text" name="jieguo" placeholder="最小值">
+							<br>
+
+							<input class="form-control" type="text" name="jieguo" placeholder="最大值">
+
+
+						</div>
+					</div>
+
+
+					<div class="col-xs-12 co_label">
+						<label>其他要求</label>
+					</div>
+					<div class="col-xs-12 co_block">
+						<label class="checkbox-inline"><input id="show_jinwei" type="checkbox" name="fuhao" value="jia" data-toggle="collapse"
+							 data-target="#jinwei" aria-expanded="false" aria-controls="collapseExample">是否求进位或退位</label>
+
+						<div id="jinwei" class="collapse">
+							<div class="well">
+								<label><input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>进位或退位</label>
+								<label><input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">不进位退位</label>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-12 co_block">
+						<label class="checkbox-inline"><input id="show_kuohao" type="checkbox" name="fuhao" value="jia" data-toggle="collapse"
+							 data-target="#kuohao" aria-expanded="false" aria-controls="collapseExample">括号出现的概率</label>
+						<div class="collapse" id="kuohao">
+							<input class="form-control" type="text" name="kuohao" value="0" disabled="true">
+						</div>
+					</div>
+					<div class="col-xs-12 co_block">
+						<label>算式数量</label>
+						<input class="form-control" type="text" name="num" value="0"><br />
+						<input class="form-control btn btn-success" type="button" name="sub" value="生成算式">
+						<br /><br />
+						<input class="form-control btn btn-primary" type="button" name="co_cut" value="复制到剪切板">
+						<br /><br />
+						<input class="form-control btn btn-info" type="button" name="point_text" value="打印内容">
+					</div>
+				</div>
+			</div>
+	</div>
+	</form>
+	<div id="text_show">
+
+	</div>
+	</div>
+	</div>
+	</div>
+</body>
+
+</html>
