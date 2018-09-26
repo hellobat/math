@@ -11,15 +11,123 @@ function init() {
 	//按钮添加参数事件
 	$("#co_add_a").click(do_add_canshu);
 	//按钮添加生成题目事件
-	$("#show [name='sub']").click(do_build_string);
+	$("#show [name='sub']").click(do_result_num);
 
 
 }
+//生成算式
+//
+function do_result_num() {
+	let result_arr = [];
+	//获取客户设置的各参数的合成条件
+	let build_obj = do_build_obj();
+	//获取客户设置的生成算式的数量
+	let result_num = parseInt($("#co_result input")[0].value);
+	//获取客户选择的结果约束条件
+	let result_method = $(".co_result_method");
+	let result_method_arr = [];
+	for (let index = 0; index < result_method.length; index++) {
+		if (result_method.eq(index).prop("checked")) {
+			result_method_arr.push(result_method.eq(index).prop("value"));
+		}
+	}
+	let i = 0;
+	let while_time = 0;
+	let result_method_pass = false;
+	while (i < result_num) {
+		if (while_time == 99999) {
+			alert("运行时间过长，请检查您的设置");
+			break;
+		}
+		while_time++;
+		//生成算式
+		let build_arr = do_build_arr(build_obj);
+		//进行结果判断
+		for (let j = 0; j < result_method_arr.length; j++) {
+			if (result_method_class[result_method_arr[j]](build_arr)) {
+				result_method_pass = true;
+			} else {
+				result_method_pass = false;
+				break;
+			}
+
+		}
+
+		//如果完全符合结果判断条件就确定这个算式
+		if (result_method_pass) {
+			result_arr.push([build_arr]);
+			i++;
+		} else {
+			//如果不符合就重新执行
+			continue;
+		}
+	}
+	console.log(result_arr);
+	return result_arr
+}
+//对结果进行约束的类，其中包含的各种方法。方法名称必须与html页面checkbox 的value属性一致，并且接受一个build_arr（算式数组）作为参数，返回一个boolem值
+result_method_class = {
+	do_result_range: function (build_arr) {
+		let result_range;
+		let result_string = eval(build_arr.join(""));
+		let result_min = parseFloat($("#jieguo input")[0].value);
+		let result_max = parseFloat($("#jieguo input")[1].value);
+		if (!result_min && result_min != 0) {
+			alert("在结果最小值设置上存在错误，请检查！");
+			return;
+		} else if (!result_max && result_max != 0) {
+			alert("在结果最大值设置上存在错误，请检查！");
+			return;
+		} else if (result_min > result_max) {
+			alert("在结果中最小值大于最大值，请检查！");
+			return;
+		} else {
+			if (result_string >= result_min && result_string <= result_max) {
+				result_range = true;
+			} else {
+				result_range = false;
+			}
+
+			return result_range
+		}
+	}
+}
+
+
+function do_build_arr(build_obj) {
+	let build_arr = [];
+	build_arr.push(do_build_canshu(build_obj.canshu[0]));
+	for (let index = 0; index < build_obj.yunsuanfu.length; index++) {
+		let yunsuanfu_str = do_build_yunsuanfu(build_obj.yunsuanfu[index]);
+		let canshu_str = do_build_canshu(build_obj.canshu[index + 1]);
+		build_arr.push(yunsuanfu_str);
+		if (canshu_str == "num_del") {
+			build_arr.pop();
+		} else {
+			build_arr.push(canshu_str);
+			//build_arr.pop();
+		}
+	}
+	return build_arr
+}
+
+function do_build_obj() {
+	let build_obj = {};
+	build_obj.canshu = do_build_check_canshu();
+	build_obj.yunsuanfu = do_build_check_yunsuanfu();
+	return build_obj
+}
+//用来生成参数
 // num_min最小值
 // num_max最大值
 // num_float保留小数位数
 // num_random出现概率
-function do_build_canshu(num_min, num_max, num_float, num_random) {
+function do_build_canshu(num) {
+	let num_min = num[0];
+	let num_max = num[1];
+	let num_float = num[2];
+	let num_random = num[3];
+	let num_result;
 	num_min = parseFloat(num_min.toFixed(num_float));
 	num_max = parseFloat(num_max.toFixed(num_float));
 	if (num_random > 100) {
@@ -27,65 +135,71 @@ function do_build_canshu(num_min, num_max, num_float, num_random) {
 	} else if (num_random < 0) {
 		num_random = 0;
 	}
-	num_make = Math.random() * num_random;
-	let num_result
+	let num_make = Math.random() * 100;
 	if (num_make >= 0 && num_make <= num_random) {
 		num_result = parseFloat(num_min + Math.random() * (num_max - num_min)).toFixed(num_float);
-		if(num_result<0){
-			num_result="("+num_result+")"
+		if (num_result < 0) {
+			num_result = "(" + num_result + ")"
 		}
-		return num_result;
 	} else {
-		console.log("concel");
+		num_result = "num_del";
+
 	}
-
+	return num_result;
 }
-
+//用来生成运算符
 function do_build_yunsuanfu(fu_arr) {
 	let fu_result = fu_arr[Math.floor(Math.random() * fu_arr.length)]
-	console.log(fu_result);
 	return fu_result;
 }
-
-function do_build_string() {
-	let suanshi='';
+//用来验证并初始化数字
+function do_build_check_canshu() {
+	let canshu_arr = [];
 	let canshu = $(".co_canshu");
-	let yunsuanfu = $(".co_yunsuanfu");
 	for (let index = 0; index < canshu.length; index++) {
-		//验证并初始化数字
-		let canshu_min = parseFloat(canshu.eq(index).children("input")[0].value);
-		let canshu_max = parseFloat(canshu.eq(index).children("input")[1].value);
+
+		let canshu_input = canshu.eq(index).children("input");
+		let canshu_min = parseFloat(canshu_input[0].value);
+		let canshu_max = parseFloat(canshu_input[1].value);
 		let canshu_float = 0;
 		let canshu_random = 0;
 		let real_index = index + 1;
-		if (!canshu_min&&canshu_min!=0) {
-			let real_index = index + 1;
+		if (!canshu_min && canshu_min != 0) {
 			alert("数字" + real_index + "中在最小值上存在错误，请检查！");
 			return;
-		} else if (!canshu_max&&canshu_max!=0) {
+		} else if (!canshu_max && canshu_max != 0) {
 			alert("数字" + real_index + "中在最大值上存在错误，请检查！");
 			return;
 		} else if (canshu_min > canshu_max) {
 			alert("数字" + real_index + "中最小值大于最大值，请检查！");
 			return;
 		} else {
-			if (canshu.eq(index).children("input")[2] == undefined || !parseInt(canshu.eq(index).children("input")[2].value)) {
+			if (canshu_input[2] == undefined || !parseInt(canshu_input[2].value)) {
 				canshu_float = 0;
 			} else {
-				canshu_float = parseInt(canshu.eq(index).children("input")[2].value)
+				canshu_float = parseInt(canshu_input[2].value)
 			}
-			if (canshu.eq(index).children("input")[3] == undefined || !parseInt(canshu.eq(index).children("input")[3].value)) {
+			if (canshu_input[3] == undefined || parseInt(canshu_input[3].value == '')) {
 				canshu_random = 100;
 			} else {
-				canshu_random = parseInt(canshu.eq(index).children("input")[3].value);
+				canshu_random = parseInt(canshu_input[3].value);
 			}
 		}
-		suanshi+=do_build_canshu(canshu_min, canshu_max, canshu_float, canshu_random);
-		//验证并初始化运算符号
-		let yunsuanfu_input=yunsuanfu.eq(index).find("input")
+		canshu_arr.push([canshu_min, canshu_max, canshu_float, canshu_random]);
+
+	}
+	return canshu_arr
+}
+//用来验证并初始化运算符
+function do_build_check_yunsuanfu() {
+	let yunsuanfu_all_arr = [];
+	let yunsuanfu = $(".co_yunsuanfu");
+	for (let index = 0; index < yunsuanfu.length; index++) {
+
+		let yunsuanfu_input = yunsuanfu.eq(index).find("input")
 		let yuansuanfu_jia = yunsuanfu_input.eq(0).prop("checked");
 		let yuansuanfu_jian = yunsuanfu_input.eq(1).prop("checked");
-		let yuansuanfu_cheng =yunsuanfu_input.eq(2).prop("checked");
+		let yuansuanfu_cheng = yunsuanfu_input.eq(2).prop("checked");
 		let yuansuanfu_chu = yunsuanfu_input.eq(3).prop("checked");
 		let yuansuanfu_arr = [];
 		if (index < yunsuanfu.length) {
@@ -102,15 +216,15 @@ function do_build_string() {
 				if (yuansuanfu_chu) {
 					yuansuanfu_arr.push('/');
 				}
-				suanshi+=do_build_yunsuanfu(yuansuanfu_arr);
+				yunsuanfu_all_arr.push(yuansuanfu_arr);
 			} else {
 				alert("请至少选择一个运算符")
 				return;
 			}
-			
+
 		}
 	}
-	console.log(suanshi);
+	return yunsuanfu_all_arr
 }
 
 

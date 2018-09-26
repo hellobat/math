@@ -77,29 +77,18 @@
 			<div class="row" id="co_foot">
 				<div class="co_in">
 					<div class="col-xs-12 co_block">
-
-						<label class="checkbox-inline"><input id="show_jieguo" type="checkbox" name="fuhao" value="jia" data-toggle="collapse"
-							 data-target="#jieguo" aria-expanded="true" aria-controls="collapseExample" checked>结果范围</label>
-
-
-						<div class="collapse in" id="jieguo">
-
-							<input class="form-control" type="text" name="jieguo" placeholder="最小值">
+						<label class="checkbox-inline"><input class="co_result_method" id="show_jieguo" type="checkbox" value="do_result_range"
+							 data-toggle="collapse" data-target="#jieguo" aria-expanded="true" aria-controls="collapseExample">结果范围</label>
+						<div class="collapse" id="jieguo">
+							<input class="form-control" type="text" name="jieguo_min" placeholder="最小值">
 							<br>
-
-							<input class="form-control" type="text" name="jieguo" placeholder="最大值">
-
-
+							<input class="form-control" type="text" name="jieguo_max" placeholder="最大值">
 						</div>
 					</div>
 
-
-					<div class="col-xs-12 co_label">
-						<label>其他要求</label>
-					</div>
 					<div class="col-xs-12 co_block">
-						<label class="checkbox-inline"><input id="show_jinwei" type="checkbox" name="fuhao" value="jia" data-toggle="collapse"
-							 data-target="#jinwei" aria-expanded="false" aria-controls="collapseExample">是否求进位或退位</label>
+						<label class="checkbox-inline"><input class="co_result_method" id="show_jinwei" type="checkbox" value="do_result_jinwei"
+							 data-toggle="collapse" data-target="#jinwei" aria-expanded="false" aria-controls="collapseExample">是否求进位或退位</label>
 
 						<div id="jinwei" class="collapse">
 							<div class="well">
@@ -108,16 +97,19 @@
 							</div>
 						</div>
 					</div>
+
 					<div class="col-xs-12 co_block">
-						<label class="checkbox-inline"><input id="show_kuohao" type="checkbox" name="fuhao" value="jia" data-toggle="collapse"
-							 data-target="#kuohao" aria-expanded="false" aria-controls="collapseExample">括号出现的概率</label>
+						<label class="checkbox-inline"><input class="co_result_method" id="show_kuohao" type="checkbox" value="do_result_kuohao"
+							 data-toggle="collapse" data-target="#kuohao" aria-expanded="false" aria-controls="collapseExample">括号出现的概率</label>
 						<div class="collapse" id="kuohao">
 							<input class="form-control" type="text" name="kuohao" value="0" disabled="true">
 						</div>
 					</div>
 					<div class="col-xs-12 co_block">
-						<label>算式数量</label>
-						<input class="form-control" type="text" name="num" value="0"><br />
+						<div id="co_result">
+							<label>算式数量</label>
+							<input class="form-control" type="text" name="num" value="1"><br />
+						</div>
 						<input class="form-control btn btn-success" type="button" name="sub" value="生成算式">
 						<br /><br />
 						<input class="form-control btn btn-primary" type="button" name="co_cut" value="复制到剪切板">
