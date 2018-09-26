@@ -18,6 +18,8 @@ function init() {
 //生成算式
 //
 function do_result_num() {
+	//初始化结果判断类的错误提示
+	result_method_class.method_err=false;
 	let result_arr = [];
 	//获取客户设置的各参数的合成条件
 	let build_obj = do_build_obj();
@@ -43,15 +45,20 @@ function do_result_num() {
 		//生成算式
 		let build_arr = do_build_arr(build_obj);
 		//进行结果判断
-		for (let j = 0; j < result_method_arr.length; j++) {
-			if (result_method_class[result_method_arr[j]](build_arr)) {
-				result_method_pass = true;
-			} else {
-				result_method_pass = false;
-				break;
+		if (!result_method_class.method_err) {
+			for (let j = 0; j < result_method_arr.length; j++) {
+				if (result_method_class[result_method_arr[j]](build_arr)) {
+					result_method_pass = true;
+				} else {
+					result_method_pass = false;
+					break;
+				}
+	
 			}
-
+		}else{
+			break;
 		}
+		
 
 		//如果完全符合结果判断条件就确定这个算式
 		if (result_method_pass) {
@@ -67,6 +74,7 @@ function do_result_num() {
 }
 //对结果进行约束的类，其中包含的各种方法。方法名称必须与html页面checkbox 的value属性一致，并且接受一个build_arr（算式数组）作为参数，返回一个boolem值
 result_method_class = {
+	method_err:false,
 	do_result_range: function (build_arr) {
 		let result_range;
 		let result_string = eval(build_arr.join(""));
@@ -74,11 +82,14 @@ result_method_class = {
 		let result_max = parseFloat($("#jieguo input")[1].value);
 		if (!result_min && result_min != 0) {
 			alert("在结果最小值设置上存在错误，请检查！");
+			result_method_class.method_err=true;
 			return;
 		} else if (!result_max && result_max != 0) {
+			result_method_class.method_err=true;
 			alert("在结果最大值设置上存在错误，请检查！");
 			return;
 		} else if (result_min > result_max) {
+			result_method_class.method_err=true;
 			alert("在结果中最小值大于最大值，请检查！");
 			return;
 		} else {
