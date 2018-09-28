@@ -1,7 +1,5 @@
 //max 算式中数字的最大值，min 算式中数字的最小值，num 出题数量，z算式结果的最大值。
-var x, y, z, sym, zmax, zmin, nmin, nmax, num, i, j, if_next, if_num, res, nr1, nr2, fuhao, jieguo, jieguo_panduan, jieguo_num;
-var all_text = "";
-var canshu = 3;
+
 
 $(document).ready(
 	init
@@ -10,10 +8,18 @@ $(document).ready(
 function init() {
 	//按钮添加参数事件
 	$("#co_add_a").click(do_add_canshu);
+	$("#co_del_a").click(do_del_canshu);
 	//按钮添加生成题目事件
 	$("#show [name='sub']").click(do_result_num);
+	$("#show [name='show_table']").click(do_table);
 
 
+}
+//生成表格
+function do_table(){
+	let get_title=$("#co_title").prop("value");
+	let in_text_show="<h3 class='text-center'>"+ get_title+  "<h3>";
+$("#text_show").prepend(in_text_show);
 }
 //生成算式
 //
@@ -47,7 +53,7 @@ function do_result_num() {
 		//进行结果判断
 		if (!result_method_class.method_err) {
 			for (let j = 0; j < result_method_arr.length; j++) {
-				if (result_method_class[result_method_arr[j]](build_arr)) {
+				if (result_method_class[result_method_arr[j]](build_arr, result_arr)) {
 					result_method_pass = true;
 				} else {
 					result_method_pass = false;
@@ -72,7 +78,7 @@ function do_result_num() {
 	console.log(result_arr);
 	return result_arr
 }
-//对结果进行约束的类，其中包含的各种方法。方法名称必须与html页面checkbox 的value属性一致，并且接受一个build_arr（算式数组）作为参数，返回一个boolean值
+//对结果进行约束的类，其中包含的各种方法。方法名称必须与html页面checkbox 的value属性一致，并且接受两个参数，build_arr（算式数组——当前生成的算式），result_arr（结果数组——符合条件的算式集合）作为参数，返回一个boolean值
 result_method_class = {
 	method_err: false,
 	do_result_range: function (build_arr) {
@@ -129,6 +135,48 @@ result_method_class = {
 			}
 
 		}
+	},
+	do_result_chachong: function (build_arr, result_arr) {
+		if (result_arr.length >= 1 && result_arr.indexOf(build_arr) >= 0) {
+			return false
+		} else {
+			return true
+		}
+	},
+	do_result_nofu: function (build_arr) {
+		let result_nofu = false;
+		let build_arr_new = build_arr.slice();
+
+		function nofu_fn() {
+			let nofu_cheng = build_arr_new.indexOf("*");
+			let nofu_chu = build_arr_new.indexOf("/");
+			if (build_arr_new.length >= 3) {
+				if (nofu_cheng >= 0 || nofu_chu >= 0) {
+					if (nofu_cheng < nofu_chu) {
+						build_arr_new.splice(nofu_cheng - 1, 3, parseFloat(build_arr_new[nofu_cheng - 1]) * parseFloat(build_arr_new[nofu_cheng + 1]));
+						nofu_fn();
+					} else {
+						build_arr_new.splice(nofu_chu - 1, 3, parseFloat(build_arr_new[nofu_chu - 1]) / parseFloat(build_arr_new[nofu_chu + 1]));
+						nofu_fn();
+					}
+				} else {
+					let new_arr = build_arr_new.splice(0, 3);
+					let new_result = eval(new_arr.join(''));
+					if (new_result >= 0) {
+						build_arr_new.unshift(new_result);
+						nofu_fn();
+					} else {
+						result_nofu = false;
+						return
+					}
+				}
+			} else {
+				result_nofu = true;
+				return
+			}
+		}
+		nofu_fn();
+		return result_nofu
 	}
 }
 
@@ -280,10 +328,22 @@ function do_get_canshu() {
 }
 
 function do_add_canshu() {
+	let canshu=$(".co_canshu").length+1;
 	add_yunsuanfu = '<div class="col-xs-12 co_label"><label>运算符</label></div><div class="col-xs-12 co_block co_yunsuanfu"><label class="checkbox-inline"><input type="checkbox" name="fuhao" value="jia">加法（+）</label><label class="checkbox-inline"><input type="checkbox" name="fuhao" value="jian">减法（-）</label><label class="checkbox-inline"><input type="checkbox" name="fuhao" value="cheng">乘法（×）</label><label class="checkbox-inline"><input type="checkbox" name="fuhao" value="chu">除法(÷)</label></div>';
-	add_canshu = '<div class="col-xs-12 co_label"><label>第' + canshu + '个数字</label></div><div class="col-xs-12 co_block co_canshu "><input class="form-control" type="text" name="nr1" placeholder="最小值"><br><input class="form-control" type="text" name="nr1" placeholder="最大值"><br><input class="form-control" type="text" name="nr1" placeholder="保留几位小数"><br><input class="form-control" type="text" name="nr1" placeholder="参数出现的概率"></div>';
+	add_canshu = '<div class="col-xs-12 co_label"><label>第' + canshu + '个数字</label></div><div class="col-xs-12 co_block co_canshu "><input class="form-control" type="text" name="nr1" placeholder="最小值"><br><input class="form-control" type="text" name="nr1" placeholder="最大值"><br><input class="form-control" type="text" name="nr1" placeholder="保留几位小数"><br><input class="form-control" type="text" name="nr1" placeholder="当前参数出现的概率,默认为0,请填入0~100之间的数"></div>';
 	$("#co_body_in").append(add_yunsuanfu + add_canshu);
 	canshu++
+}
+
+function do_del_canshu() {
+	let del_canshu = $("#co_body_in");
+	if (del_canshu.children("div").length > 6) {
+		for (let index = 0; index < 4; index++) {
+			del_canshu.children("div:last-child").remove();
+		}
+	}else{
+		alert("不能继续删除了！")
+	}
 }
 
 function doCanshu(nr, sym_in) {
