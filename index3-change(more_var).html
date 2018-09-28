@@ -144,8 +144,14 @@
 						</div>
 						<input class="form-control btn btn-success" type="button" name="sub" value="生成算式">
 						<br /><br />
-						<input class="form-control btn btn-success" type="button" name="show_table" value="生成表格">
-						<br /><br />
+						<input type="text" class="form-control" id="co_tr_num" placeholder="表格列数" aria-describedby="inputGroupSuccess1Status">
+						<br>
+						<div class="input-group">
+							<input type="text" class="form-control" id="co_td_height" placeholder="单行表格高度" aria-describedby="inputGroupSuccess1Status">
+							<div class="btn btn-success input-group-addon" id="show_table" style="background-color:#5cb85c;color: white"><span>生成算式</span>
+							</div>
+						</div>
+						<br />
 						<input class="form-control btn btn-primary" type="button" name="co_cut" value="复制到剪切板">
 						<br /><br />
 						<input class="form-control btn btn-info" type="button" name="point_text" value="打印内容">
@@ -154,14 +160,9 @@
 			</div>
 	</div>
 	</form>
-	<div id="text_show">
+	<div id="table_show">
 
-		<table class="table table-striped">
-			<tr><td>1</td><td>2</td><td>3</td><td>4</td></tr>
-			<tr><td>1</td><td>2</td><td>3</td><td>4</td></tr>
-			<tr><td>1</td><td>2</td><td>3</td><td>4</td></tr>
-			<tr><td>1</td><td>2</td><td>3</td><td>4</td></tr>
-		  </table>
+
 	</div>
 </body>
 

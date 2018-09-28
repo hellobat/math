@@ -1,6 +1,5 @@
 //max 算式中数字的最大值，min 算式中数字的最小值，num 出题数量，z算式结果的最大值。
-
-
+let result_arr = [];
 $(document).ready(
 	init
 );
@@ -11,15 +10,43 @@ function init() {
 	$("#co_del_a").click(do_del_canshu);
 	//按钮添加生成题目事件
 	$("#show [name='sub']").click(do_result_num);
-	$("#show [name='show_table']").click(do_table);
-
-
+	$("#show_table").click(do_table);
+	$("#show [name='point_text']").click(do_print);
+	$("#show [name='co_cut']").click(do_copy);
 }
 //生成表格
-function do_table(){
-	let get_title=$("#co_title").prop("value");
-	let in_text_show="<h3 class='text-center'>"+ get_title+  "<h3>";
-$("#text_show").prepend(in_text_show);
+function do_table() {
+	$("#table_show").html('');
+	result_arr = do_result_num();
+	console.log(result_arr);
+	//题目
+	let get_title = $("#co_title").prop("value");
+	let title_str = "<h3 class='text-center'>" + get_title + "<h3>";
+	$("#table_show").prepend(title_str);
+	//表格
+	let get_tr_num = parseInt($("#co_tr_num").prop("value"));
+	let get_td_height = parseInt($("#co_td_height").prop("value"));
+	let table_str = '<table class="table table-striped">';
+	let add_n_str = '';
+	for (let j = 0; j < get_td_height; j++) {
+		add_n_str += "<br>";
+
+	}
+	for (let index = 0; index < result_arr.length; index++) {
+		let result_str = result_arr[index].join(" ") + " =" + add_n_str;
+		console.log(result_arr[index].length);
+		if (index % get_tr_num == 0) {
+			table_str += "<tr><td>" + result_str;
+
+		} else if (index % get_tr_num == 6) {
+			table_str += result_str + "</td></tr>"
+		} else {
+			table_str += "<td>" + result_str + "</td>"
+		}
+
+	}
+	table_str += "</table>";
+	$("#table_show").append(table_str);
 }
 //生成算式
 //
@@ -68,14 +95,13 @@ function do_result_num() {
 
 		//如果完全符合结果判断条件就确定这个算式
 		if (result_method_pass) {
-			result_arr.push([build_arr]);
+			result_arr.push(build_arr);
 			i++;
 		} else {
 			//如果不符合就重新执行
 			continue;
 		}
 	}
-	console.log(result_arr);
 	return result_arr
 }
 //对结果进行约束的类，其中包含的各种方法。方法名称必须与html页面checkbox 的value属性一致，并且接受两个参数，build_arr（算式数组——当前生成的算式），result_arr（结果数组——符合条件的算式集合）作为参数，返回一个boolean值
@@ -266,7 +292,7 @@ function do_build_check_canshu() {
 			} else {
 				canshu_float = parseInt(canshu_input[2].value)
 			}
-			if (canshu_input[3] == undefined || parseInt(canshu_input[3].value == '')) {
+			if (canshu_input[3] == undefined || canshu_input[3].value.trim() == '') {
 				canshu_random = 100;
 			} else {
 				canshu_random = parseInt(canshu_input[3].value);
@@ -328,7 +354,7 @@ function do_get_canshu() {
 }
 
 function do_add_canshu() {
-	let canshu=$(".co_canshu").length+1;
+	let canshu = $(".co_canshu").length + 1;
 	add_yunsuanfu = '<div class="col-xs-12 co_label"><label>运算符</label></div><div class="col-xs-12 co_block co_yunsuanfu"><label class="checkbox-inline"><input type="checkbox" name="fuhao" value="jia">加法（+）</label><label class="checkbox-inline"><input type="checkbox" name="fuhao" value="jian">减法（-）</label><label class="checkbox-inline"><input type="checkbox" name="fuhao" value="cheng">乘法（×）</label><label class="checkbox-inline"><input type="checkbox" name="fuhao" value="chu">除法(÷)</label></div>';
 	add_canshu = '<div class="col-xs-12 co_label"><label>第' + canshu + '个数字</label></div><div class="col-xs-12 co_block co_canshu "><input class="form-control" type="text" name="nr1" placeholder="最小值"><br><input class="form-control" type="text" name="nr1" placeholder="最大值"><br><input class="form-control" type="text" name="nr1" placeholder="保留几位小数"><br><input class="form-control" type="text" name="nr1" placeholder="当前参数出现的概率,默认为0,请填入0~100之间的数"></div>';
 	$("#co_body_in").append(add_yunsuanfu + add_canshu);
@@ -341,7 +367,7 @@ function do_del_canshu() {
 		for (let index = 0; index < 4; index++) {
 			del_canshu.children("div:last-child").remove();
 		}
-	}else{
+	} else {
 		alert("不能继续删除了！")
 	}
 }
@@ -559,111 +585,41 @@ function doGouzao(shili_in) {
 	}
 }
 
-function doAdd() {
-	doGouzao("a-<<<b>*e>+<c+d>>");
-	res = " ";
-	fuhao = []
-	$("#show_table").remove();
-	i = 1;
-	last_num = 0;
-	//参数
-	nr1 = $("#show [name='nr1']").val();
-	nr2 = $("#show [name='nr2']").val();
-	jieguo = $("#show [name='jieguo']").val();
-	jieguo_panduan = new doJieguo(jieguo);
-	//alert(jieguo_panduan.jieguo_max);
 
-	//符号
-	$("#show [name='fuhao']:checked").each(function () {
-		fuhao.push($(this).val())
-	});
 
-	num = parseInt($("#show [name='num']").val());
-	$("#show").append("<!--startprint-->");
-	res += "<div class='center-block' id='show_table'><h1 class='text-center'>一年二班刘墨瞳口算作业</h1><h3 class='text-center'>日期（&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;）正确（&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;）时间（&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;）</h3><table class='table table-responsive'>";
-	if (jieguo_panduan.jieguo_jieguo == "cuowu") {
-		alert("结果格式输入错误");
-	} else if (doCanshu(nr1) == -10000000000 || doCanshu(nr2) == -10000000000) {
-		alert("参数格式输入错误")
-	} else {
-		while (i <= num) {
-
-			if (last_num != i) {
-				if (i == 1) {
-					res += "<tr><td>";
-					//alert(res)
-				}
-				if (i != 1 && i % 3 == 1) {
-					res += "</td></tr><tr><td>";
-					//alert(res)
-				}
-				if (i != 1 && i % 3 != 1) {
-					res += "</td><td>";
-					//alert(res)
-				}
-				last_num++;
-			}
-			sym = doFuhao(fuhao);
-			x = doCanshu(nr1, sym);
-			y = doCanshu(nr2, sym);
-			if (sym == "jia") {
-				jieguo_num = x + y;
-				if (doPanduan(jieguo_num, jieguo_panduan, sym)) {
-					res += i + "、" + x + "+" + y + "=";
-					i++;
-				}
-
-			}
-			if (sym == "jian") {
-				jieguo_num = x - y;
-				if (doPanduan(jieguo_num, jieguo_panduan, sym)) {
-					res += i + "、" + x + "-" + y + "=";
-					i++;
-				}
-			}
-			if (sym == "cheng") {
-				jieguo_num = x * y;
-				if (doPanduan(jieguo_num, jieguo_panduan, sym)) {
-					res += i + "、" + x + "×" + y + "=";
-					i++;
-				}
-			}
-			if (sym == "chu") {
-				if (y != 0) {
-					jieguo_num = x / y;
-					if (doPanduan(jieguo_num, jieguo_panduan, sym)) {
-						res += i + "、" + x + "÷" + y + "=";
-						i++;
-					}
-				}
-
-			}
-		}
+function do_print() {
+	let show_str = $("body").html();
+	let table_show_str = $("#table_show").html();
+	let all_input = $("input");
+	let input_arr_value = [];
+	let input_arr_checked = [];
+	for (let index = 0; index < all_input.length; index++) {
+		input_arr_value.push(all_input.eq(index).prop("value"));
+		input_arr_checked.push(all_input.eq(index).prop("checked"));
 	}
 
-	res += "</td></tr></table></div>";
-	$("#text_show").append(res);
-	$("#text_show").append("<!--endprint-->");
-	//$("#text_show").select();
-	//document.execCommand("copy");
-	all_text = $("body").html();
-}
-
-function doPrint() {
-
-	$("body").html($("#show_table").html());
+	$("body").html(table_show_str);
 	window.print();
 	setTimeout(function () {
-		if (all_text != "") {
-			$("body").html(all_text);
-			$("#show [name='nmax']").val(nmax);
-			$("#show [name='nmin']").val(nmin);
-			$("#show [name='zmax']").val(zmax);
-			$("#show [name='zmin']").val(zmin);
-			$("#show [name='num']").val(num);
-			$("#show [name='if_next']").val(if_next);
-			init();
-
+		$("body").html(show_str);
+		init();
+		let input_now = $("input");
+		for (let j = 0; j < input_now.length; j++) {
+			input_now.eq(j).attr("value", input_arr_value[j]);
+			input_now.eq(j).attr("checked", input_arr_checked[j]);
 		}
-	}, 2000)
+
+	}, 100)
+}
+
+function do_copy() {
+	let input_show=document.createElement('input');
+	input_show.value=result_arr.join("");
+	document.body.appendChild(input_show);
+	
+	input_show.select();
+	document.execCommand("copy");
+	input_show.style.display='none';
+	alert("复制成功")
+
 }
