@@ -10,15 +10,56 @@ function init() {
 	$("#co_del_a").click(do_del_canshu);
 	//按钮添加生成题目事件
 	$("#show [name='sub']").click(do_result_num);
-	$("#show_table").click(do_table);
-	$("#show [name='point_text']").click(do_print);
+	$("#show_table").click(do_new_tab);
+	$("#show_table_add").click(do_add_tab);
+	$("#show_table_mix").click(do_mix_tab);
+	
+	$("#point_text").click(do_print);
 	$("#show [name='co_cut']").click(do_copy);
 }
+//表格格式化
+function do_table_format(result_arr) {
+	for (let index = 0; index < result_arr.length;) {
+		let cheng_in = result_arr[index].indexOf("*");
+		let chu_in = result_arr[index].indexOf("/");
+		if (cheng_in >= 0) {
+			result_arr[index].splice(cheng_in, 1, "×");
+		} else if (chu_in >= 0) {
+			result_arr[index].splice(chu_in, 1, "÷");
+		} else {
+			index++;
+		}
+
+	}
+	return result_arr
+}
 //生成表格
-function do_table() {
+function do_new_tab() {
+	let result_arr_present = do_result_num();
+	result_arr = [];
+	do_table(result_arr);
+}
+
+function do_add_tab() {
+	let result_arr_present = do_result_num();
+	result_arr = result_arr.concat(do_table_format(result_arr_present));
+	do_table(result_arr);
+}
+
+function do_mix_tab() {
+	let result_arr_present = [];
+	let index = 0;
+	while (0 < result_arr.length) {
+		let num = Math.floor(Math.random() * result_arr.length);
+		result_arr_present.push(result_arr.splice(num, 1)[0]);
+	}
+	result_arr=result_arr_present.slice();
+	do_table(result_arr);
+}
+
+function do_table(result_arr) {
+	//清空表格
 	$("#table_show").html('');
-	result_arr = do_result_num();
-	console.log(result_arr);
 	//题目
 	let get_title = $("#co_title").prop("value");
 	let title_str = "<h3 class='text-center'>" + get_title + "<h3>";
@@ -57,7 +98,13 @@ function do_result_num() {
 	//获取客户设置的各参数的合成条件
 	let build_obj = do_build_obj();
 	//获取客户设置的生成算式的数量
-	let result_num = parseInt($("#co_result input")[0].value);
+	let result_num = parseInt($("#co_result")[0].value);
+	if ($("#co_result")[0].value.trim()=="") {
+		result_num=1;
+	}
+	if(result_num<=0){
+		alert("输入的数字不正确，请重新输入");
+	}
 	//获取客户选择的结果约束条件
 	let result_method = $(".co_result_method");
 	let result_method_arr = [];
@@ -372,218 +419,11 @@ function do_del_canshu() {
 	}
 }
 
-function doCanshu(nr, sym_in) {
-	this.a = [];
-	this.ra = Math.random();
-	this.ress = '';
-	this.nmax = 0;
-	this.nmin = 0;
-	if (nr.indexOf(",") > 0) {
-		this.a = nr.split(",");
-
-		for (var m = 0; m < this.a.length; m++) {
-			if (this.ra > m / this.a.length && this.ra <= (m + 1) / this.a.length) {
-				this.ress = this.a[m];
-				if (this.ress.indexOf(">") > 0) {
-					var res_r = this.ress.split(">");
-					this.nmax = parseInt(res_r[0]);
-					this.nmin = parseInt(res_r[1]);
-					if (this.nmax != res_r[0] || this.nmin != res_r[1]) {
-						return -10000000000;
-					} else {
-						return Math.round(Math.random() * (this.nmax - this.nmin) + this.nmin);
-					}
-				} else {
-					if (parseInt(this.ress) != this.ress) {
-						return -10000000000;
-					} else {
-						return parseInt(this.ress);
-					}
-				}
-			}
-		}
-	} else if (nr.indexOf(">") > 0) {
-		this.a = nr.split(">");
-		this.nmax = parseInt(this.a[0]);
-		this.nmin = parseInt(this.a[1]);
-		if (this.nmax != this.a[0] || this.nmin != this.a[1]) {
-			return -10000000000;
-		} else {
-			return Math.round(Math.random() * (this.nmax - this.nmin) + this.nmin);
-		}
-	} else if (nr.indexOf("!") > 0) {
-		this.canshu_fanwei = nr.split("!")
-		if (sym_in == "jia") {
-			this.nmax = parseInt(this.canshu_fanwei[0]);
-			this.nmin = parseInt(this.canshu_fanwei[1]);
-			if (this.nmax != this.canshu_fanwei[0] || this.nmin != this.canshu_fanwei[1]) {
-				return -10000000000;
-			} else {
-				return Math.round(Math.random() * (this.nmax - this.nmin) + this.nmin);
-			}
-		}
-		if (sym_in == "jian") {
-			this.nmax = parseInt(this.canshu_fanwei[2]);
-			this.nmin = parseInt(this.canshu_fanwei[3]);
-			if (this.nmax != this.canshu_fanwei[2] || this.nmin != this.canshu_fanwei[3]) {
-				return -10000000000;
-			} else {
-				return Math.round(Math.random() * (this.nmax - this.nmin) + this.nmin);
-			}
-		}
-		if (sym_in == "cheng") {
-			this.nmax = parseInt(this.canshu_fanwei[4]);
-			this.nmin = parseInt(this.canshu_fanwei[5]);
-			if (this.nmax != this.canshu_fanwei[4] || this.nmin != this.canshu_fanwei[5]) {
-				return -10000000000;
-			} else {
-				return Math.round(Math.random() * (this.nmax - this.nmin) + this.nmin);
-			}
-		}
-		if (sym_in == "chu") {
-			this.nmax = parseInt(this.canshu_fanwei[6]);
-			this.nmin = parseInt(this.canshu_fanwei[7]);
-			if (this.nmax != this.canshu_fanwei[6] || this.nmin != this.canshu_fanwei[7]) {
-				return -10000000000;
-			} else {
-				return Math.round(Math.random() * (this.nmax - this.nmin) + this.nmin);
-			}
-		}
-	} else {
-		if (parseInt(nr) == nr) {
-			return parseInt(nr);
-		} else {
-			return -10000000000;
-		}
-	}
-}
-
-function doFuhao(fuhao_in) {
-	this.radom_fuhao = Math.random();
-	for (var l = 0; l < fuhao_in.length; l++) {
-		if (this.radom_fuhao > l / fuhao_in.length && this.radom_fuhao < (l + 1) / fuhao_in.length) {
-			return fuhao_in[l];
-		}
-
-	}
-}
-
-function doJieguo(jieguo_in) {
-
-	if (parseInt(jieguo_in) == 0 || jieguo_in == "") {
-		this.jieguo_jieguo = "kong";
-
-	} else if (jieguo_in.indexOf(">") > 0) {
-		var jieguo_r = jieguo_in.split(">");
-		this.jieguo_max = parseInt(jieguo_r[0]);
-		this.jieguo_min = parseInt(jieguo_r[1]);
-		if (this.jieguo_max != jieguo_r[0] || this.jieguo_min != jieguo_r[1]) {
-			this.jieguo_jieguo = "cuowu";
-		} else {
-			this.jieguo_jieguo = "fanwei";
-		}
-
-	} else if (jieguo_in.indexOf("%") > 0) {
-		var zhengchu_r = jieguo_in.split("%");
-		this.zhengchu = parseInt(zhengchu_r[0]);
-		this.jieguo_max = parseInt(zhengchu_r[1]);
-		this.jieguo_min = parseInt(zhengchu_r[2]);
-		if (this.zhengchu != zhengchu_r[0] || this.jieguo_max != zhengchu_r[1] || this.jieguo_min != zhengchu_r[2]) {
-			this.jieguo_jieguo = "cuowu";
-		} else {
-			this.jieguo_jieguo = "zhengchu";
-		}
-	} else if (jieguo_in.indexOf("!") > 0) {
-		this.fuhao_fanwei = jieguo_in.split("!");
-		for (var m = 0; m < this.fuhao_fanwei.length; m++) {
-			if (this.fuhao_fanwei[m] != parseInt(this.fuhao_fanwei[m])) {
-				this.jieguo_jieguo = "cuowu";
-				break;
-			} else {
-				this.jieguo_jieguo = "fuhao_fanwei";
-			}
-		}
-	} else if (parseInt(jieguo_in) == jieguo_in) {
-		this.zhengshu = parseInt(jieguo_in);
-		this.jieguo_jieguo = "zhengshu";
-
-	} else {
-
-		this.jieguo_jieguo = "cuowu"
-	}
-
-}
-
-function doPanduan(jieguo_num_in, jieguo_panduan_in, sym_in) {
-
-	if (jieguo_panduan_in.jieguo_jieguo == "kong") {
-		return true;
-	} else if (jieguo_panduan_in.jieguo_jieguo == "fanwei") {
-		if (jieguo_num_in <= jieguo_panduan_in.jieguo_max && jieguo_num_in >= jieguo_panduan_in.jieguo_min) {
-			return true;
-		}
-	} else if (jieguo_panduan_in.jieguo_jieguo == "zhengchu") {
-		if (jieguo_num_in % jieguo_panduan_in.zhengchu == 0 && jieguo_num_in <= jieguo_panduan_in.jieguo_max && jieguo_num_in >= jieguo_panduan_in.jieguo_min) {
-			return true;
-		}
-	} else if (jieguo_panduan_in.jieguo_jieguo == "zhengshu") {
-		if (jieguo_num_in == jieguo_panduan_in.zhengshu) {
-			return true;
-		}
-	} else if (jieguo_panduan_in.jieguo_jieguo == "fuhao_fanwei") {
-		if (sym_in == "jia") {
-
-			if (jieguo_num_in >= jieguo_panduan_in.fuhao_fanwei[1] && jieguo_num_in <= jieguo_panduan_in.fuhao_fanwei[0]) {
-				return true;
-			}
-		}
-		if (sym_in == "jian") {
-			if (jieguo_num_in >= jieguo_panduan_in.fuhao_fanwei[3] && jieguo_num_in <= jieguo_panduan_in.fuhao_fanwei[2]) {
-				return true;
-			}
-		}
-		if (sym_in == "cheng") {
-			if (jieguo_num_in >= jieguo_panduan_in.fuhao_fanwei[5] && jieguo_num_in <= jieguo_panduan_in.fuhao_fanwei[4]) {
-				return true;
-			}
-		}
-		if (sym_in == "chu") {
-			if (jieguo_num_in >= jieguo_panduan_in.fuhao_fanwei[7] && jieguo_num_in <= jieguo_panduan_in.fuhao_fanwei[6]) {
-				return true;
-			}
-		}
-	}
-}
-
-function doGouzao(shili_in) {
-	var shili = shili_in;
-	var shili_kaishi = shili.lastIndexOf("<");
-	var shili_jieshu = shili.indexOf(">", shili_kaishi);
-
-	//alert("kaishi:" + shili_kaishi + "jieshu:" + shili_jieshu + "length:" + shili.length);
-	var jiequ = shili.substring(shili_kaishi + 1, shili_jieshu);
-	if (shili.lastIndexOf("<") >= 0) {
-
-		if ((jiequ != "" && jiequ.indexOf("+") < 0 && jiequ.indexOf("-") < 0) || (shili_kaishi == 0 && shili_jieshu == (shili.length - 1))) {
-			shili = shili.split('');
-			shili.splice(shili_jieshu, 1, "");
-			shili.splice(shili_kaishi, 1, "");
-			shili = shili.join('');
 
 
-		} else {
-			shili = shili.split('');
-			shili.splice(shili_jieshu, 1, ")");
-			shili.splice(shili_kaishi, 1, "(");
-			shili = shili.join('');
 
-		}
-		doGouzao(shili);
-	} else {
-		alert(shili)
-		return shili;
-	}
-}
+
+
 
 
 
@@ -613,13 +453,17 @@ function do_print() {
 }
 
 function do_copy() {
-	let input_show=document.createElement('input');
-	input_show.value=result_arr.join("");
+	let input_show = document.createElement('textarea');
+	for (let index = 0; index < result_arr.length; index++) {
+		input_show.value += result_arr[index].join(" ") + " =" + '\n';
+
+	}
 	document.body.appendChild(input_show);
-	
+
 	input_show.select();
 	document.execCommand("copy");
-	input_show.style.display='none';
+	input_show.style.display = 'none';
 	alert("复制成功")
+	input_show.parentNode.removeChild(input_show);
 
 }

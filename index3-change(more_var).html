@@ -18,12 +18,6 @@
 		<form>
 			<div class="row" id=co_head>
 				<h4 class="text-center">瞳瞳爸口算题自动生成器</h4>
-				<div class="co_in">
-					<div class="col-xs-12">
-						<label>输入试卷标题</label>
-						<input id="co_title" class="form-control" type="text" placeholder="___年___班___________口算题">
-					</div>
-				</div>
 			</div>
 
 			<!-- 计算参数 -->
@@ -138,23 +132,28 @@
 						</div>
 					</div>
 					<div class="col-xs-12 co_block">
-						<div id="co_result">
-							<label>算式数量</label>
-							<input class="form-control" type="text" name="num" value="1"><br />
-						</div>
-						<input class="form-control btn btn-success" type="button" name="sub" value="生成算式">
-						<br /><br />
+
+						<input id="co_result" class="form-control" type="text" name="num" placeholder="算式数量"><br />
+						<br>
+						<input id="co_title" class="form-control" type="text" placeholder="试卷标题">
+						<br>
 						<input type="text" class="form-control" id="co_tr_num" placeholder="表格列数" aria-describedby="inputGroupSuccess1Status">
 						<br>
 						<div class="input-group">
-							<input type="text" class="form-control" id="co_td_height" placeholder="单行表格高度" aria-describedby="inputGroupSuccess1Status">
-							<div class="btn btn-success input-group-addon" id="show_table" style="background-color:#5cb85c;color: white"><span>生成算式</span>
+							<input type="text" class="form-control" id="co_td_height" placeholder="表格单行高度" aria-describedby="inputGroupSuccess1Status">
+
+							<div class="btn btn-success input-group-addon" id="show_table_add" style="background-color:#5cb85c;border: #5cb85c;color: white"><span>添加算式</span>
+							</div>
+							<div class="btn btn-success input-group-addon" id="show_table_mix" style="background-color:#f0ad4e;border: #f0ad4e;color: white"><span>混排算式</span>
+							</div>
+							<div class="btn btn-success input-group-addon" id="show_table" style="background-color:#d9534f;border: #d9534f;color: white"><span>清空算式</span>
+							</div>
+							<div class="btn btn-success input-group-addon" id="point_text" style="background-color:#5bc0de;border: #5bc0de;color: white"><span>打印算式</span>
 							</div>
 						</div>
 						<br />
 						<input class="form-control btn btn-primary" type="button" name="co_cut" value="复制到剪切板">
 						<br /><br />
-						<input class="form-control btn btn-info" type="button" name="point_text" value="打印内容">
 					</div>
 				</div>
 			</div>
