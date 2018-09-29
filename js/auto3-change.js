@@ -3,10 +3,14 @@ var x, y, z, sym, zmax, zmin, nmin, nmax, num, i, j, if_next, if_num, res, nr1, 
 var all_text = "";
 
 $(document).ready(
+	
 	init
 );
 
 function init() {
+	let a=["7","8","9"];
+	let b=[["1","2","3"],["1","2","3"],["1","2","3"]];
+	console.log(b.indexOf(a));
 	$("#show [name='sub']").click(doAdd);
 	$("#show [name='point_text']").click(doPrint);
 }

@@ -1,10 +1,11 @@
 //max 算式中数字的最大值，min 算式中数字的最小值，num 出题数量，z算式结果的最大值。
-let result_arr = [];
+let global_result_arr = [];
 $(document).ready(
 	init
 );
 
 function init() {
+
 	//按钮添加参数事件
 	$("#co_add_a").click(do_add_canshu);
 	$("#co_del_a").click(do_del_canshu);
@@ -13,7 +14,7 @@ function init() {
 	$("#show_table").click(do_new_tab);
 	$("#show_table_add").click(do_add_tab);
 	$("#show_table_mix").click(do_mix_tab);
-	
+
 	$("#point_text").click(do_print);
 	$("#show [name='co_cut']").click(do_copy);
 }
@@ -33,28 +34,27 @@ function do_table_format(result_arr) {
 	}
 	return result_arr
 }
-//生成表格
+//清空表格
 function do_new_tab() {
-	let result_arr_present = do_result_num();
-	result_arr = [];
-	do_table(result_arr);
+	global_result_arr = [];
+	do_table(global_result_arr);
 }
 
 function do_add_tab() {
 	let result_arr_present = do_result_num();
-	result_arr = result_arr.concat(do_table_format(result_arr_present));
-	do_table(result_arr);
+	global_result_arr = global_result_arr.concat(do_table_format(result_arr_present));
+	do_table(global_result_arr);
 }
 
 function do_mix_tab() {
 	let result_arr_present = [];
 	let index = 0;
-	while (0 < result_arr.length) {
-		let num = Math.floor(Math.random() * result_arr.length);
-		result_arr_present.push(result_arr.splice(num, 1)[0]);
+	while (0 < global_result_arr.length) {
+		let num = Math.floor(Math.random() * global_result_arr.length);
+		result_arr_present.push(global_result_arr.splice(num, 1)[0]);
 	}
-	result_arr=result_arr_present.slice();
-	do_table(result_arr);
+	global_result_arr = result_arr_present.slice();
+	do_table(global_result_arr);
 }
 
 function do_table(result_arr) {
@@ -66,7 +66,19 @@ function do_table(result_arr) {
 	$("#table_show").prepend(title_str);
 	//表格
 	let get_tr_num = parseInt($("#co_tr_num").prop("value"));
+	if ($("#co_tr_num").prop("value").trim() == "") {
+		get_tr_num = 3;
+	}
+	if (get_tr_num <= 0) {
+		alert("表格列数输入错误，请重新输入")
+	}
 	let get_td_height = parseInt($("#co_td_height").prop("value"));
+	if ($("#co_td_height").prop("value").trim() == "") {
+		get_td_height = 1;
+	}
+	if (get_td_height <= 0) {
+		alert("表格单行高度输入错误，请重新输入")
+	}
 	let table_str = '<table class="table table-striped">';
 	let add_n_str = '';
 	for (let j = 0; j < get_td_height; j++) {
@@ -75,7 +87,6 @@ function do_table(result_arr) {
 	}
 	for (let index = 0; index < result_arr.length; index++) {
 		let result_str = result_arr[index].join(" ") + " =" + add_n_str;
-		console.log(result_arr[index].length);
 		if (index % get_tr_num == 0) {
 			table_str += "<tr><td>" + result_str;
 
@@ -99,10 +110,10 @@ function do_result_num() {
 	let build_obj = do_build_obj();
 	//获取客户设置的生成算式的数量
 	let result_num = parseInt($("#co_result")[0].value);
-	if ($("#co_result")[0].value.trim()=="") {
-		result_num=1;
+	if ($("#co_result")[0].value.trim() == "") {
+		result_num = 1;
 	}
-	if(result_num<=0){
+	if (result_num <= 0) {
 		alert("输入的数字不正确，请重新输入");
 	}
 	//获取客户选择的结果约束条件
@@ -117,7 +128,7 @@ function do_result_num() {
 	let while_time = 0;
 	let result_method_pass = true;
 	while (i < result_num) {
-		if (while_time == 29999) {
+		if (while_time == 199999) {
 			alert("运行时间过长，请检查您的设置");
 			break;
 		}
@@ -210,11 +221,16 @@ result_method_class = {
 		}
 	},
 	do_result_chachong: function (build_arr, result_arr) {
-		if (result_arr.length >= 1 && result_arr.indexOf(build_arr) >= 0) {
-			return false
-		} else {
-			return true
+		let build_arr_new = build_arr.slice().join("");
+		let result_arr_new = result_arr.slice();
+		for (let index = 0; index < result_arr_new.length; index++) {
+			
+			if(result_arr_new[index].join("")===build_arr_new){
+				return false
+			}
 		}
+		return true
+
 	},
 	do_result_nofu: function (build_arr) {
 		let result_nofu = false;
@@ -224,19 +240,16 @@ result_method_class = {
 			let nofu_cheng = build_arr_new.indexOf("*");
 			let nofu_chu = build_arr_new.indexOf("/");
 			if (build_arr_new.length >= 3) {
-				if (nofu_cheng >= 0 || nofu_chu >= 0) {
-					if (nofu_cheng < nofu_chu) {
-						build_arr_new.splice(nofu_cheng - 1, 3, parseFloat(build_arr_new[nofu_cheng - 1]) * parseFloat(build_arr_new[nofu_cheng + 1]));
-						nofu_fn();
-					} else {
-						build_arr_new.splice(nofu_chu - 1, 3, parseFloat(build_arr_new[nofu_chu - 1]) / parseFloat(build_arr_new[nofu_chu + 1]));
-						nofu_fn();
-					}
+				if ((nofu_cheng < nofu_chu || nofu_chu < 0) && nofu_cheng >= 0) {
+					build_arr_new.splice(nofu_cheng - 1, 3, parseFloat(build_arr_new[nofu_cheng - 1]) * parseFloat(build_arr_new[nofu_cheng + 1]));
+					nofu_fn();
+				} else if ((nofu_cheng > nofu_chu || nofu_cheng < 0) && nofu_chu >= 0) {
+					build_arr_new.splice(nofu_chu - 1, 3, parseFloat(build_arr_new[nofu_chu - 1]) / parseFloat(build_arr_new[nofu_chu + 1]));
+					nofu_fn();
 				} else {
-					let new_arr = build_arr_new.splice(0, 3);
-					let new_result = eval(new_arr.join(''));
-					if (new_result >= 0) {
-						build_arr_new.unshift(new_result);
+					let eval_build_arr2 = eval(build_arr_new.splice(0, 3).join(""));
+					if (eval_build_arr2 >= 0) {
+						build_arr_new.unshift(eval_build_arr2);
 						nofu_fn();
 					} else {
 						result_nofu = false;
@@ -250,7 +263,37 @@ result_method_class = {
 		}
 		nofu_fn();
 		return result_nofu
+	},
+	do_result_zhengchu: function (build_arr) {
+		let result_zhengchu = false;
+		let build_arr_new = build_arr.slice();
+
+		function zhengchu_fn() {
+			let zhengchu_cheng = build_arr_new.indexOf("*");
+			let zhengchu_chu = build_arr_new.indexOf("/");
+			if (build_arr_new.length >= 3 && zhengchu_chu >= 0) {
+				if (zhengchu_cheng < zhengchu_chu && zhengchu_cheng >= 0) {
+					build_arr_new.splice(zhengchu_cheng - 1, 3, parseFloat(build_arr_new[zhengchu_cheng - 1]) * parseFloat(build_arr_new[zhengchu_cheng + 1]));
+					zhengchu_fn();
+				} else {
+					if (parseFloat(build_arr_new[zhengchu_chu - 1]) % parseFloat(build_arr_new[zhengchu_chu + 1]) == 0) {
+						build_arr_new.splice(zhengchu_chu - 1, 3, parseFloat(build_arr_new[zhengchu_chu - 1]) / parseFloat(build_arr_new[zhengchu_chu + 1]));
+						zhengchu_fn();
+					} else {
+						result_zhengchu = false;
+						return
+
+					}
+				}
+			} else {
+				result_zhengchu = true;
+				return
+			}
+		}
+		zhengchu_fn();
+		return result_zhengchu
 	}
+
 }
 
 
@@ -454,8 +497,8 @@ function do_print() {
 
 function do_copy() {
 	let input_show = document.createElement('textarea');
-	for (let index = 0; index < result_arr.length; index++) {
-		input_show.value += result_arr[index].join(" ") + " =" + '\n';
+	for (let index = 0; index < global_result_arr.length; index++) {
+		input_show.value += global_result_arr[index].join(" ") + " =" + '\n';
 
 	}
 	document.body.appendChild(input_show);
